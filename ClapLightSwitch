@@ -1,0 +1,98 @@
+/*  Lublin 2015
+    written by: Norbert 'NrbPhm' Olak
+    
+I wrote it for my purposes, please give me a credit if you would like to use it.
+main features: 
+            vacuum cleaning resistant
+            accidental item drop resistant
+            optional led indicator for reading period
+            possible event program on XX number of claps (ie. sound attachments or other effects -> it's up to you)
+            
+ please visit my site: norbertolak.wordpress.com - you can find there my creations and thoughts
+*/
+
+const int clap = 3;
+const int light = 4;
+const int led = 2;
+
+int clapState = 1;
+int preClapState = 1;
+int clapCount = 0;
+
+int lightState = 0;
+unsigned long preTime = 0; //variable for indicating time
+
+void setup() {
+ 
+ pinMode (clap, INPUT);
+ pinMode (light, OUTPUT);
+ pinMode (led, OUTPUT);
+ 
+ digitalWrite(light, 0);
+ digitalWrite(led, 0);
+}
+
+void loop() {
+   unsigned long actualTime=millis();
+   clapState=digitalRead(clap);
+   
+   int Time = actualTime - preTime; // variable to simplify conditions readability in loops, side effect - triggers loop from time to time
+   
+    if (clapState != preClapState){          //compare actual clapState with last state from the main loop(idle)
+    if (clapState == 0 && clapCount == 0) { //loop conditions says it all 
+      clapCount++;                         //increment clap count
+      preTime = actualTime;               //makes Time measure time from first clap
+      digitalWrite(led, 1);   // led blink to indicate listening time begin
+      delay(10);
+      digitalWrite(led, 0);   // led blink to indicate listening time begin
+    }
+    //time range in which you need to clap once again in order to switch light
+    if (clapState==0 && Time <=600 && Time >= 150) {
+      clapCount++;
+      programState();
+    }
+    if (clapState==0 && Time > 600 && clapCount != 1) {
+      clapCount++;
+    }
+    delay(150);
+  }
+  // Event loop trigger, modify clap count number as you like
+      if (clapCount >= 11){
+      event();
+      }
+      
+  //Time limit loop, after 3 seconds from first clap reset clap count to 0  
+      if (Time >=3000){
+      clapCount=0;
+      digitalWrite(led, 0);   // turn the indicator led off when listening time expires
+      delay(10);
+      }
+ //Blink diode when Time is expired
+      if (Time < 3000 && Time > 2800) {
+        digitalWrite(led, 1);   // led blink to indicate listening time expired
+        delay(50);
+        digitalWrite(led, 0);   // led blink to indicate listening time expired
+        delay(50);
+      }
+ //Listening time for light switching clap is expired
+      if (Time < 600 && Time > 150) {
+        digitalWrite(led, 1);
+        digitalWrite(led, 0);
+      }
+
+  preClapState=clapState; //update current sensor state.
+}
+
+void programState() { //method for light switching
+  if (lightState == 0) {
+    lightState = 1;
+  }
+  else {
+    lightState = 0;
+  }
+  digitalWrite(light, lightState);
+}
+
+void event(){                   
+//put your event code here
+}

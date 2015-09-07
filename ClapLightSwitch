@@ -8,7 +8,8 @@ main features:
             optional led indicator for reading period
             possible event program on XX number of claps (ie. sound attachments or other effects -> it's up to you)
             
- please visit my site: norbertolak.wordpress.com - you can find there my creations and thoughts
+ Read article about this project at my site: norbertolak.wordpress.com
+ You can find there: detailed explaination, current bugs & suggestions, summary
 */
 
 const int clap = 3;
